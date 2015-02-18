@@ -1,0 +1,2 @@
+# cgrn-chat-app-test
+This repo contains the development code for a basic chat application created using Node.js and self-hosted and deployed on a lab server. The chat information is stored using MongoDB. This repo serves as a test for running a perpetual node process to keep a WebSocket-based application alive, which can be used later to develop the 2nd Version of the cGRN repository. Developed by Shrey Gupta for the Translational Genomics Research Institute, 2015.

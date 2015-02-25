@@ -12,6 +12,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.get('/', function(req, res){
+	console.log("Loading index page...");
 	res.sendFile(path.join(__dirname, 'templates', 'index.html'));
 });
 app.post('/',function(req,res){
@@ -42,5 +43,5 @@ io.on('connection', function(socket){
 });
 
 http.listen(serverPort, serverHost, function(){
-	console.log('listening on *:' + serverPort);
+	console.log('listening on ' + serverHost + ':' + serverPort);
 });

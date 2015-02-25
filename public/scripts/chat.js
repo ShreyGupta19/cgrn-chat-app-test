@@ -1,9 +1,10 @@
 $(document).ready(function(){
 	console.log(getGroup());
-	var socketGlobal = io.connect(window.location.hostname + ':' + window.location.port + "/");
+	var socketGlobal = io.connect(window.location.origin + "/");
 	socketGlobal.emit('groupConnect', getGroup());
+	console.log(window.location);
 	setTimeout(function(){
-		socket = io.connect(window.location.hostname + ':' + window.location.port + "/" + getGroup());
+		socket = io.connect(window.location.origin + "/" + getGroup());
 		nsp = getGroup();
 		$('form').submit(function(){
 			socketGlobal.emit('message', {"msg":$('#m').val(),"nsp":nsp});

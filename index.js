@@ -5,8 +5,10 @@ var io = require('socket.io')(http);
 var path = require('path');
 var bodyParser = require('body-parser');
 
+console.log(process.env);
+
 var serverPort = process.env.YOUR_PORT || process.env.PORT || 1337;
-var serverHost = process.env.YOUR_HOST || 'localhost';
+var serverHost = process.env.YOUR_HOST || process.env.HOST ||'localhost';
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));

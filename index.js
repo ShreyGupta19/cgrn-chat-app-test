@@ -5,6 +5,9 @@ var io = require('socket.io')(http);
 var path = require('path');
 var bodyParser = require('body-parser');
 
+var serverPort = process.env.YOUR_PORT || process.env.PORT || 1337;
+var serverHost = process.env.YOUR_HOST || 'localhost';
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -38,6 +41,6 @@ io.on('connection', function(socket){
 	});
 });
 
-http.listen(3000, function(){
+http.listen(serverPort, serverHost, function(){
 	console.log('listening on *:3000');
 });

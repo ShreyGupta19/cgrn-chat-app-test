@@ -7,8 +7,7 @@ var bodyParser = require('body-parser');
 
 console.log(process.env);
 
-var serverPort = process.env.YOUR_PORT || process.env.PORT || 1337;
-var serverHost = process.env.YOUR_HOST || process.env.HOST ||'localhost';
+app.set('port', (process.env.PORT || 5000));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -44,6 +43,6 @@ io.on('connection', function(socket){
 	});
 });
 
-http.listen(serverPort, serverHost, function(){
-	console.log('listening on ' + serverHost + ':' + serverPort);
+http.listen(app.get('port'), function(){
+	console.log('listening on:' + app.get('port'));
 });

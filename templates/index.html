@@ -8,18 +8,8 @@
 	<link rel="stylesheet" href="./bootstrap/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="./bootstrap/css/bootstrap-combobox.css" />
 	<style>
-		.group-input-options-list {
-			list-style-type: none;
-			max-height:200px;
-			padding: 0px;
-			overflow: auto;
-			box-shadow: 1px 1px 1px rgba(0,0,0,1);
-		}
-		.group-input-option {
-			border-bottom:1px solid rgba(200,200,200,1);
-			height:40px;
-			font-size:14px;
-			padding:12px 10px;
+		#name-form-group {
+			display: none;
 		}
 	</style>
 </head>
@@ -58,29 +48,36 @@
 			<div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
 				<h1>Login to GRN Chat</h1>
 				<form action="/" method="post" class="form-horizontal chat-connect-form">
+					<div class="form-group" id="name-form-group">
+						<label for="nameInput" class="control-label col-sm-2">Name</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="nameInput" placeholder="Enter full name" name="login-name">
+						</div>
+					</div>
 					<div class="form-group" id="email-form-group">
 						<label for="emailInput" class="control-label col-sm-2">Email</label>
 						<div class="col-sm-10">
-							<input type="email" class="form-control" id="emailInput" placeholder="Enter email" name="login-email">
+							<input required="required" type="email" class="form-control" id="emailInput" placeholder="Enter email" name="login-email">
 						</div>
 					</div>
 					<div class="form-group" id="password-form-group">
 						<label for="passwordInput" class="control-label col-sm-2">Password</label>
 						<div class="col-sm-10">
-							<input type="password" class="form-control" id="passwordInput" placeholder="Enter password" name="login-password">
+							<input required="required"  type="password" class="form-control" id="passwordInput" placeholder="Enter password" name="login-password">
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="groupInput" class="control-label col-sm-2">Group</label>
 						<div class="col-sm-10">
-							<select class="form-control combobox" id="groupInput" name="login-group">
-								<option value="">Select a group</option>
+							<select required="required" class="form-control combobox" id="groupInput" name="login-group">
+								<option value="">Select a group from the dropdown</option>
 							</select>
 						</div>
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" class="btn btn-default">Sign in</button>
+							<button type="submit" class="btn btn-default sign-in-button" id="submit-button">Sign in</button>
+							<button type="button" class="btn btn-default register-button" id="switch-button">New User? Sign up here!</button>
 						</div>
 					</div>
 				</form>
@@ -105,10 +102,13 @@
 			$(".chat-connect-form").submit(function(event) {
 				event.preventDefault();
 				var $form = $(this);
+				var submitType = ($("#submit-button").hasClass("sign-in-button")) ? "login" : "register";
 				var postReq = $.post("/",{
+					"login-name":$form.find("input[name='login-name']").val(),
 					"login-group":$form.find("input[name='login-group']").val(),
 					"login-email":$form.find("input[name='login-email']").val(),
-					"login-password":$form.find("input[name='login-password']").val()
+					"login-password":$form.find("input[name='login-password']").val(),
+					"type": submitType
 				},'json').success(function(data){
 					if (data.redirect)
                 		window.location = data.redirect;
@@ -116,6 +116,20 @@
                 		$("#email-form-group,#password-form-group").addClass("has-error has-feedback");
                 	}
 				});
+			});
+			$("#switch-button").click(function(){
+				console.log($(this).attr("class"));
+				if($(this).hasClass("register-button")){
+					console.log('hey');
+					$("#switch-button").removeClass("register-button").addClass("sign-in-button").html("Already a user? Sign in here.");
+					$("#submit-button").addClass("register-button").removeClass("sign-in-button").html("Register now!");
+					$("#name-form-group").css("display","block").attr("required","required");
+				}
+				else {
+					$("#switch-button").addClass("register-button").removeClass("sign-in-button").html("New User? Sign up here!");
+					$("#submit-button").removeClass("register-button").addClass("sign-in-button").html("Sign in");
+					$("#name-form-group").css("display","none").removeAttr("required");
+				}
 			});
 		});	
 	</script>

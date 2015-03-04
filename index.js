@@ -55,23 +55,40 @@ mongodb.connect(mongoURI,function(err,db){
 	});
 	app.post('/',function(req,res){
 		console.log(req.body);
-		users.find({email:req.body["login-email"],password:req.body["login-password"]}).toArray(function(err,docs){
-			if(err) throw err;
-			else if(!docs.length){
-				res.send({error:"Incorrect email or password."});
-			}
-			else if(docs.length > 1){
-				res.send({error:"Your password and email is the same as another members!"});
-			}
-			else {
-				console.log(docs);
-				req.session.user = docs[0];
-				users.update({email:docs[0].email}, {$push:{logins: {"room":req.body["login-group"],"time":new Date().toISOString()}}}, function(err, result){
-					if(err) throw err;
-					res.send({redirect:'/rooms/'+req.body["login-group"]});
-				});
-			}
-		});
+		if(req.body.type === "login"){
+			users.find({email:req.body["login-email"],password:req.body["login-password"]}).toArray(function(err,docs){
+				if(err) throw err;
+				else if(!docs.length){
+					res.send({error:"Incorrect email or password."});
+				}
+				else if(docs.length > 1){
+					res.send({error:"Your password and email is the same as another members!"});
+				}
+				else {
+					console.log(docs);
+					req.session.user = docs[0];
+					users.update({email:docs[0].email}, {$push:{logins: {"room":req.body["login-group"],"time":new Date().toISOString()}}}, function(err, result){
+						if(err) throw err;
+						res.send({redirect:'/rooms/'+req.body["login-group"]});
+					});
+				}
+			});
+		}
+		else if(req.body.type === "register"){
+			var newUserDoc = {email:req.body["login-email"], password:req.body["login-password"], name:{first:req.body["login-name"].split(" ")[0], last:req.body["login-name"].split(" ")[1]}, logins:[{"room":req.body["login-group"],"time":new Date().toISOString()}]};
+			users.find({email:req.body["login-email"]}).toArray(function(err,docs){
+				if (err) throw err;
+				else if (docs.length) res.send({error: "You already have an account!"});
+				else {
+					users.insert(newUserDoc,function(err,records){
+						if(err) throw err;
+						console.log(records);
+						req.session.user = records[0];
+						res.send({redirect:'/rooms/'+req.body["login-group"]});
+					});
+				}
+			});
+		}
 	});
 	var modifyChatFile = function(groupName,routeData){
 		fs.readFile(path.join(__dirname, 'templates', 'chat.html'), {"encoding":'utf8'}, function(err, data){

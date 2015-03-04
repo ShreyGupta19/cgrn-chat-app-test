@@ -14,9 +14,9 @@ var mongoURI = process.env.MONGOLAB_URI || 'mongodb://localhost:27017/chatdbtest
 app.set('port', (process.env.PORT || 5000));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(express.static(__dirname + '/public'));
 app.use(cookieParser());
 app.use(session({secret: '1234567890QWERTY', resave:false, saveUninitialized: false}));
+app.use(express.static(__dirname + '/public'));
 
 function isEmpty(obj) {
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -84,7 +84,11 @@ mongodb.connect(mongoURI,function(err,db){
 		});
 	}
 	app.get('/rooms/:groupName', function(req, res){
-		modifyChatFile(req.params.groupName,{"req":req,"res":res});
+		if(req.session.user)
+			modifyChatFile(req.params.groupName,{"req":req,"res":res});
+		else {
+			res.redirect('/');
+		}
 	});
 
 	io.on('connection', function(socket){
@@ -99,7 +103,7 @@ mongodb.connect(mongoURI,function(err,db){
 			var currentTime = new Date().toISOString();
 			rooms.update({name:data.nsp}, {$push:{messages: {"user":data.user.email,"time":currentTime,"content":data.msg}}}, function(err, result){
 				if(err) throw err;
-				io.of("/"+data.nsp).emit('message', {"msg":data.msg, "user":data.user.name, "time":currentTime});
+				io.of("/"+data.nsp).emit('message', {"msg":data.msg, "user":data.user, "time":currentTime});
 			});
 		});
 	});

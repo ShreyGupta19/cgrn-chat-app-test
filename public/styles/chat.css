@@ -34,14 +34,32 @@ ul.chat-messages-bin li.chat-message-module {
 	padding: 5px 0px;
 	display: block;
 }
+li.chat-message-module.my-chat-message-module {
+	text-align: right;
+}
 li.chat-message-module div.chat-message-user-id {
 	padding:3px 20px;
-	border-radius: 5px 0px 0px 5px;
 	display:inline-block;
+}
+div.chat-message-user-id.chat-message-component-right, div.chat-message-content.chat-message-component-right {
+	border-radius: 0px 5px 5px 0px;
+}
+div.chat-message-user-id.chat-message-component-left, div.chat-message-content.chat-message-component-left {
+	border-radius: 5px 0px 0px 5px;
 }
 li.chat-message-module div.chat-message-content {
 	padding:3px 20px;
 	display:inline-block;
+}
+
+li.chat-message-module.chat-message-module-admin {
+	text-align: center;
+}
+
+li.chat-message-module.chat-message-module-admin div.chat-message-content {
+	border-radius: 5px;
+	background-color: rgba(50,50,50,1);
+	color:rgba(200,200,200,1);
 }
 
 div.row.form-row {

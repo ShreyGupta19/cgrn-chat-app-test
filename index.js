@@ -54,7 +54,6 @@ mongodb.connect(mongoURI,function(err,db){
 		else res.sendFile(path.join(__dirname, 'templates', 'index.html'));
 	});
 	app.post('/',function(req,res){
-		console.log(req.body);
 		if(req.body.type === "login"){
 			users.find({email:req.body["login-email"],password:req.body["login-password"]}).toArray(function(err,docs){
 				if(err) throw err;
@@ -65,7 +64,6 @@ mongodb.connect(mongoURI,function(err,db){
 					res.send({error:"Your password and email is the same as another members!"});
 				}
 				else {
-					console.log(docs);
 					req.session.user = docs[0];
 					users.update({email:docs[0].email}, {$push:{logins: {"room":req.body["login-group"],"time":new Date().toISOString()}}}, function(err, result){
 						if(err) throw err;
@@ -82,7 +80,6 @@ mongodb.connect(mongoURI,function(err,db){
 				else {
 					users.insert(newUserDoc,function(err,records){
 						if(err) throw err;
-						console.log(records);
 						req.session.user = records[0];
 						res.send({redirect:'/rooms/'+req.body["login-group"]});
 					});
@@ -111,14 +108,17 @@ mongodb.connect(mongoURI,function(err,db){
 	io.on('connection', function(socket){
 		socket.on('groupConnect', function(data){
 			var groupNsp = io.of('/' + data.group);
-			rooms.update({name:data.group}, {$push:{logins: {"user":data.user,"timeIn":new Date().toISOString()}}}, function(err, result){
+			var currentTime = new Date().toISOString();
+			rooms.update({name:data.group}, {$push:{logins: {"user":data.user.email,"timeIn":currentTime}}}, function(err, result){
 				if(err) throw err;
+				console.log("hi");
+				io.of("/"+data.group).emit('message', {"msg":data.user.name.first + " has joined the chat.", "user":{"name":{"first":"System","last":"Admin"},"_id":"000000000000000000000001"}, "time":currentTime});
 			});
 		});
 		socket.on('message', function(data){
 			console.log('data: ' + JSON.stringify(data));
 			var currentTime = new Date().toISOString();
-			rooms.update({name:data.nsp}, {$push:{messages: {"user":data.user.email,"time":currentTime,"content":data.msg}}}, function(err, result){
+			rooms.update({name:data.nsp}, {$push:{messages: {"user":data.user.email,"time":currentTime,"content":/*data.msg*/""}}}, function(err, result){
 				if(err) throw err;
 				io.of("/"+data.nsp).emit('message', {"msg":data.msg, "user":data.user, "time":currentTime});
 			});
